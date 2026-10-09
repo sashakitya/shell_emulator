@@ -50,3 +50,25 @@ class Shell:
             print(f"{command}: {error}")
             return False
         return True
+
+    def run_script(self, path):
+        """Выполняет стартовый скрипт, показывая и ввод, и вывод.
+
+        Пустые строки и строки, начинающиеся с #, пропускаются.
+        Выполнение останавливается на первой ошибке (возвращает False).
+        """
+        try:
+            with open(path, encoding="utf-8") as handle:
+                lines = handle.read().splitlines()
+        except (OSError, UnicodeDecodeError):
+            print(f"Cannot read script: {path}")
+            return False
+        for number, line in enumerate(lines, start=1):
+            text = line.strip()
+            if not text or text.startswith("#"):
+                continue
+            print(self.prompt() + text)
+            if not self.execute(text):
+                print(f"Script stopped: error on line {number}")
+                return False
+        return True
